@@ -1,0 +1,294 @@
+<html>
+		<head>
+		<title>Computer Vision Project</title>
+		<link href='http://fonts.googleapis.com/css?family=Nunito:300|Crimson+Text|Droid+Sans+Mono' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" title="Default" href="styles/github.css">
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+
+		<link rel="stylesheet" href="highlighting/styles/default.css">
+		<script src="highlighting/highlight.pack.js"></script>
+
+		<style type="text/css">
+		body {
+			margin: 0px;
+			width: 100%;
+			font-family: 'Crimson Text', serif;
+			font-size: 20px;
+			background: #fcfcfc;
+		}
+		h1 {
+			font-family: 'Nunito', sans-serif;
+			font-weight: normal;
+			font-size: 28px;
+			margin: 25px 0px 0px 0px;
+			text-transform: lowercase;
+
+		}
+
+		h2 {
+			font-family: 'Nunito', sans-serif;
+			font-weight: normal;
+			font-size: 32px;
+			margin: 15px 0px 35px 0px;
+			color: #333;
+			word-spacing: 3px;
+		}
+
+		h3 {
+			font-family: 'Nunito', sans-serif;
+			font-weight: normal;
+			font-size: 26px;
+			margin: 10px 0px 10px 0px;
+			color: #333;
+			word-spacing: 2px;
+		}
+		h4 {
+			font-family: 'Nunito', sans-serif;
+			font-weight: normal;
+			font-size: 22px;
+			margin: 10px 0px 10px 0px;
+			color: #333;
+			word-spacing: 2px;
+		}
+
+		h5 {
+			font-family: 'Nunito', sans-serif;
+			font-weight: normal;
+			font-size: 18px;
+			margin: 10px 0px 10px 0px;
+			color: #111;
+			word-spacing: 2px;
+		}
+
+		p, li {
+			color: #444;
+		}
+
+		a {
+			color: #DE3737;
+		}
+
+		.container {
+			margin: 0px auto 0px auto;
+			width: 1160px;
+		}
+
+		#header {
+			background: #333;
+			width: 100%;
+		}
+
+		#headersub {
+			color: #ccc;
+			width: 960px;
+			margin: 0px auto 0px auto;
+			padding: 20px 0px 20px 0px;
+		}
+
+		.chart {
+			width: 480px;
+		}
+		.lol {
+			font-size: 16px;
+			color: #888;
+			font-style: italic;
+		}
+		.sep {
+			height: 1px;
+			width: 100%;
+			background: #999;
+			margin: 20px 0px 20px 0px;
+		}
+		.footer{
+			font-size: 16px;
+		}
+		.latex {
+			width: 100%;
+		}
+
+		.latex img {
+			display: block;
+			margin: 0px auto 0px auto;
+		}
+
+		pre {
+			font-family: 'Droid Sans Mono';
+			font-size: 14px;
+		}
+
+		table td {
+		  text-align: center;
+		  vertical-align: middle;
+		}
+
+		table td img {
+		  text-align: center;
+		  vertical-align: middle;
+		}
+
+		#contents a {
+		}
+		</style>
+		<script type="text/javascript">
+			hljs.initHighlightingOnLoad();
+		</script>
+		</head>
+		<body>
+		<div id="header" >
+		<div id="headersub">
+		<h1>Aayush Kumar</h1>
+		</div>
+		</div>
+		<div class="container">
+
+		<h2> Project 3 / Camera Calibration and Fundamental Matrix Estimation with RANSAC</h2>
+
+		<h3>Introduction</h3>
+
+		<p> Prior to this project, I had some vague experience with RANSAC and using it in the context of CS3630, robotics and perception. However, this project and unit was incredibly insightful and showed me different use cases for the algorithm. This project was presented in 3 main components:</p>
+
+		<ol>
+		<li>Deriving the Camera Projection Matrix</li>
+		<li>Estimating the Fundamental Matrix</li>
+		<li>Using RANSAC to find Optimal Fundamental Matrix</li>
+		</ol>
+
+		<h3>Deriving the Camera Projection Matrix</h3>
+		<p> 	My results were quite promising for the camera center, as I used Singlular Value Decomposition to produce a system of equarions. From this I solved for the Projection matrix and was able to find the following camera center:</p>
+		<h4>Results:</h4>
+		<pre><code>
+				The projection matrix is:
+				-0.4583    0.2947    0.0140   -0.0040
+				 0.0509    0.0546    0.5411    0.0524
+				-0.1090   -0.1783    0.0443   -0.5968
+
+
+			 The total residual is: <0.0445>
+
+			 The estimated location of camera is: <-1.5127, -2.3517, 0.2826>
+		</code></pre>
+		<table border=0>
+
+			<tr>
+				<td>
+					<img src="./imgs/fig3.png" width="48%"/>
+					<img src="./imgs/fig4.png"  width="48%"/>
+				</td>
+			</tr>
+		</table>
+
+			<div style="clear:both">
+		<h3>Estimating the Fundamental Matrix</h3>
+
+		<p> This process involved mapping points of interest, denoted by (u,v) in image a to image b. Once again, I used a system of equations but this time used the following matrix equation</p>
+
+		<table border=0>
+			<tr>
+				<td>
+					<img src="./imgs/matrixEq.png" width="72%"/>
+				</td>
+			</tr>
+		</table>
+
+		<h3>Using RANSAC to find Optimal Fundamental Matrix</h3>
+
+
+		For every sampling of 8 points, I estimated a fundamental matrix using the techniques described in part 2 and then selected the matrix that resulted in the most inliers.
+		I chose to run RANSAC for 1000 iterations and generate random sample sizes of 8 with an error threshold of 0.02.
+		Inliers were determined by seeing if points had a Sampson Error, a widely used distance metric for gauging the accuracy of the Fundamental Matrix, beneath the threshold.
+		Below is my annotated code for RANSAC and beneath that are my results for both Mount Rushmore and Notre Dame:
+
+		<h3>Annotated Code</h3>
+
+		<pre><code>
+			function [ Best_Fmatrix, inliers_a, inliers_b] = ransac_fundamental_matrix(matches_a, matches_b)
+
+				matchDim = size(matches_a);
+				iterations = 1000;
+				sampleSize = 8;
+				threshold = 0.02;
+				maxInliers = 0;
+				bestInlierInd = 0;
+				Best_Fmatrix = 0;
+
+				for i = 1:iterations
+
+					sample = randsample(matchDim(1), sampleSize);
+
+					F = estimate_fundamental_matrix(matches_a(sample, :), matches_b(sample, :));
+
+					oneRow = ones(1, matchDim(1));
+					F_a = F * [matches_a'; oneRow];
+					F_b = F * [matches_b'; oneRow];
+
+					F2 = zeros(1, matchDim(1));
+					for j = 1:matchDim(1)
+						% homogenize
+						mB_hom = [matches_b(j,:) 1];
+						mA_hom = [matches_a(j,:) 1];
+						F2(j) = mB_hom * F * mA_hom';
+					end
+
+					% Get Sampson Error and threshold to find inliers
+					error = (F2 .^ 2) ./ (F_a(1,:) .^ 2 + F_a(2,:) .^ 2 + F_b(1,:) .^ 2 + F_b(2,:) .^ 2);
+					inlierInd = find(abs(error) < threshold);
+					numInliers = length(inlierInd);
+
+					% see if better inliers are found
+					if (numInliers > maxInliers)
+						% better model found
+						maxInliers = numInliers;
+						bestInlierInd = inlierInd;
+						Best_Fmatrix = F;
+
+					end
+
+
+				end
+
+				inliers_a = matches_a(bestInlierInd, :);
+				inliers_b = matches_b(bestInlierInd, :);
+
+			end
+
+		</code></pre>
+
+		<h3>Results in a table</h3>
+
+		<table border=1>
+		<tr>
+			<td>
+				<img src="imgs/rushFig1.jpg" width="48%"/>
+				<img src="imgs/rushFig2.jpg" width="48%"/>
+
+			</td>
+
+		</tr>
+		<tr>
+				<td>
+					<img src="imgs/rushFig3.jpg" width="48%"/>
+					<img src="imgs/rushFig4.jpg" width="48%"/>
+
+				</td>
+
+			</tr>
+
+		<tr>
+				<td>
+						<img src="imgs/notreFig1.jpg" width="48%"/>
+						<img src="imgs/notreFig2.jpg" width="48%"/>
+					</td>
+		</tr>
+		<tr>
+				<td>
+						<img src="imgs/notreFig3.jpg" width="48%"/>
+						<img src="imgs/notreFig4.jpg" width="48%"/>
+				</td>
+		</tr>
+
+		</table>
+
+		<div style="clear:both" >
+		</div>
+		</body>
+		</html>
